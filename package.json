@@ -1,0 +1,22 @@
+{
+  "name": "dynamic-express-logging",
+  "version": "1.0.1",
+  "description": "express logging for incoming request and response",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1hanymhajna/express-logging.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1hanymhajna/express-logging/issues"
+  },
+  "homepage": "https://github.com/1hanymhajna/express-logging#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/*
+*.log
+typings/*
+.vscode/*
+.idea/*
+.vscode/*
+/coverage
+/app/coverage
+*history*
+*mochawesome-report*
+.DS_Store
