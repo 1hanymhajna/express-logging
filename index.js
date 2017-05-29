@@ -2,28 +2,34 @@
  * Created by hanymhajna on 29/05/2017.
  */
 
-var logger;
+var customLogger;
 var util = require('util');
 var maskingObject;
 var _ = require('lodash');
 
-module.exports.init = function (log, jsonMaskingObject) {
-    logger = log;
+module.exports.init = function (logger, jsonMaskingObject) {
+    customLogger = logger;
     maskingObject = jsonMaskingObject;
 };
 
 module.exports.requestMiddleware = function (req, res, next) {
-    var incomingRequest = _.cloneDeep(req);
-    if (isNeededMasking(req)) maskRequest(incomingRequest.body);
-    logger.info(util.format("Start handling request %s:%s", incomingRequest.method, incomingRequest.originalUrl), {headers: JSON.stringify(secureHeaders(req, incomingRequest.headers))}, {body: JSON.stringify(incomingRequest.body)});
 
+    // logging incoming request
+    var incomingRequest = _.cloneDeep(req);
+    var maskObject = getMaskObject(req);
+    if (maskObject) maskBody(incomingRequest.body);
+    customLogger.info(util.format("Start handling request %s:%s", incomingRequest.method, incomingRequest.originalUrl), {headers: JSON.stringify(maskingHeaders(maskObject, incomingRequest.headers))}, {body: JSON.stringify(incomingRequest.body)});
+
+
+    // logging response
     var end = res.end;
     res.end = function (chunk, encoding) {
         res.end = end;
         res.end(chunk, encoding);
         var responseBody = safeJSONParse(chunk);
-        if (isNeededMasking(req) && res.statusCode == 200) maskRequest(responseBody);
-        logger.info("Finish handle %s:%s request", req.method, req.originalUrl, util.format("statusCode: %s", res.statusCode), util.format("headers: %j", secureHeaders(req, req.headers)), util.format("responseBody: %j", responseBody));
+        var maskObject = getMaskObject(req);
+        if (maskObject && res.statusCode == 200) maskBody(responseBody);
+        customLogger.info(util.format("Finish handle %s:%s request", req.method, req.originalUrl), util.format("statusCode: %s", res.statusCode), util.format("headers: %j", maskingHeaders(maskObject, req.headers)), util.format("responseBody: %j", responseBody));
     };
 
     next();
@@ -38,23 +44,21 @@ function safeJSONParse(string) {
     }
 }
 
-var isNeededMasking = function (req) {
-    return maskingObject.filter(function (request) {
+var getMaskObject = function (req) {
+    var maskObjects = maskingObject.filter(function (request) {
         if (req.originalUrl.indexOf(request.endPoint) > -1 && req.method === request.method) return true;
         else return false;
     });
+    if (maskObjects && maskObjects.length > 0) return maskObjects[0];
+    else return undefined;
 };
 
-var secureHeaders = function (req, headers) {
+var maskingHeaders = function (maskObject, headers) {
     var incomingHeader = _.cloneDeep(headers);
-    var maskObject = maskingObject.filter(function (request) {
-        if (req.originalUrl.indexOf(request.endPoint) > -1 && req.method === request.method) return true;
-        else return false;
-    });
 
-    if (maskObject && maskObject.length > 0) {
-        maskObject[0].excludeHeaders.forEach(function (headerToBeRemoved) {
-            delete incomingHeader[headerToBeRemoved];
+    if (maskObject) {
+        maskObject.headers.forEach(function (headerToBeRemoved) {
+            incomingHeader[headerToBeRemoved] = maskString(incomingHeader[headerToBeRemoved]);
         })
     }
 
@@ -62,7 +66,7 @@ var secureHeaders = function (req, headers) {
 
 };
 
-var maskRequest = function (body) {
+var maskBody = function (body) {
     if (body) {
         var keys = Object.keys(body);
         keys.forEach(function (key) {

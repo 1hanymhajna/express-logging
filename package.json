@@ -1,10 +1,11 @@
 {
   "name": "dynamic-express-logging",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "express logging for incoming request and response",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/istanbul cover node_modules/.bin/_mocha ./unit-tests/index-spec.js -- --reporter mochawesome",
+    "code-coverage-validation": "istanbul check-coverage --statement 98 --branch 98 --function 98"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,13 @@
   "homepage": "https://github.com/1hanymhajna/express-logging#readme",
   "dependencies": {
     "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.4.2",
+    "mochawesome": "^2.2.0",
+    "rewire": "^2.5.2",
+    "should": "^11.2.1",
+    "sinon": "^2.3.2"
   }
 }
