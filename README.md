@@ -13,7 +13,7 @@ express logging for incoming request and response
 ## How to use
 1- npm install dynamic-express-logging
 2- In your index.js file add these lines:
-```bash
+```node
 var dynamicExpressLogging = require('dynamic-express-logging');
 dynamicExpressLogging.init(`your logger`,`JSON object to mask your request and response body & headers`);
 app.use(dynamicExpressLogging.requestMiddleware);
@@ -31,7 +31,7 @@ app.use(dynamicExpressLogging.requestMiddleware);
   }
 ]
 ```
-### JSON EXAMPLE
+#### JSON EXAMPLE
 ```json
 [
   {
@@ -45,7 +45,7 @@ app.use(dynamicExpressLogging.requestMiddleware);
 ```
 
 
-#### Full example:
+### Full example:
 ```node
 var dynamicExpressLogging = require('dynamic-express-logging');
 var bunyan = require('bunyan'); // you can use your logger
