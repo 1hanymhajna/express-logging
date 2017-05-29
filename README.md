@@ -1,6 +1,13 @@
 # express-logging
-- express logging for incoming request and response
-- npm: https://www.npmjs.com/package/dynamic-express-logging
+[![NPM](https://nodei.co/npm/dynamic-express-logging.png)](https://nodei.co/npm/dynamic-express-logging/)
+
+[![NPM](https://nodei.co/npm-dl/dynamic-express-logging.png?height=3)](https://nodei.co/npm/dynamic-express-logging/)
+
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][downloads-url]
+[![Build Status][travis-image]][travis-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
+[![MIT License][license-image]][license-url]
 
 ## Features
 * Logging every incoming request
