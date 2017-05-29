@@ -1,5 +1,6 @@
 # express-logging
-express logging for incoming request and response
+- express logging for incoming request and response
+- npm: https://www.npmjs.com/package/dynamic-express-logging
 
 ## Features
 * Logging every incoming request
