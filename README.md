@@ -35,11 +35,30 @@ app.use(dynamicExpressLogging.requestMiddleware);
 ```json
 [
   {
-    "endPoint": "`endPoint`",
-    "method": "`METHOD`",
+    "endPoint": "/v1/health",
+    "method": "GET",
     "headers":[
-      `header keys`
+      "user-agent"
     ]
   }
 ]
+```
+
+
+#### Full example:
+```node
+var dynamicExpressLogging = require('dynamic-express-logging');
+var bunyan = require('bunyan'); // you can use your logger
+var logger = bunyan.createLogger();
+var maskObject = [
+                   {
+                     "endPoint": "/v1/health",
+                     "method": "GET",
+                     "headers":[
+                       "user-agent"
+                     ]
+                   }
+                 ]
+dynamicExpressLogging.init(logger,maskObject);
+app.use(dynamicExpressLogging.requestMiddleware);
 ```
