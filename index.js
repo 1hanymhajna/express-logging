@@ -17,7 +17,7 @@ module.exports.requestMiddleware = function (req, res, next) {
     // logging incoming request
     var incomingRequest = _.cloneDeep(req);
     var maskObject = getMaskObject(req);
-    if (maskObject) maskBody(incomingRequest.body);
+    if (maskObject) maskBody(incomingRequest.body, maskObject.requestNodesToMask);
     customLogger.info(util.format("Start handling request %s:%s", incomingRequest.method, incomingRequest.originalUrl), {headers: JSON.stringify(maskingHeaders(maskObject, incomingRequest.headers))}, {body: JSON.stringify(incomingRequest.body)});
 
 
@@ -28,7 +28,7 @@ module.exports.requestMiddleware = function (req, res, next) {
         res.end(chunk, encoding);
         var responseBody = safeJSONParse(chunk);
         var maskObject = getMaskObject(req);
-        if (maskObject && res.statusCode == 200) maskBody(responseBody);
+        if (maskObject && res.statusCode == 200) maskBody(responseBody, maskObject.responseNodesToMask);
         customLogger.info(util.format("Finish handle %s:%s request", req.method, req.originalUrl), util.format("statusCode: %s", res.statusCode), util.format("headers: %j", maskingHeaders(maskObject, req.headers)), util.format("responseBody: %j", responseBody));
     };
 
@@ -66,18 +66,27 @@ var maskingHeaders = function (maskObject, headers) {
 
 };
 
-var maskBody = function (body) {
-    if (body) {
+var maskBody = function (body, nodesToMask) {
+    if (body && nodesToMask) {
+        nodesToMask.forEach(function (nodeToMask) {
+            body[nodeToMask] = maskString(body[nodeToMask]);
+        });
+    } else if (body) {
         var keys = Object.keys(body);
         keys.forEach(function (key) {
             body[key] = maskString(body[key]);
         });
+    }else{
+
     }
 };
 
 function maskString(string) {
-    for (var i = 1; i < string.length - 1; i++) {
-        string = string.substr(0, i) + '*' + string.substr(i + 1);
+    if(string){
+        for (var i = 1; i < string.length - 1; i++) {
+            string = string.substr(0, i) + '*' + string.substr(i + 1);
+        }
+        return string
     }
-    return string;
+    return undefined;
 }

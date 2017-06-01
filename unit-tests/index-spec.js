@@ -144,6 +144,285 @@ describe("index spec", function () {
         });
 
 
+        describe("When call it with object to be mask with specific request node to mask", function () {
+            var sandbox;
+            var requestObject;
+            var responseObject;
+            var expectedResponseBody;
+            var stubLogger;
+            var stubNext;
+            var maskingObject;
+
+            before(function () {
+                sandbox = sinon.sandbox.create();
+                stubLogger = {info: sandbox.stub()};
+
+                requestObject = {
+                    method: "GET",
+                    originalUrl: "/v1/health",
+                    headers: {"first": "value", "second": "value"},
+                    body: {"key1": "value","key2":"value","key3":"value"}
+                };
+
+                responseObject = {
+                    statusCode: 200,
+                    end: sandbox.stub()
+                };
+
+                expectedResponseBody = JSON.stringify({
+                    "firstKey": "firstValue",
+                    "secondKey": "secondValue"
+                });
+
+                maskingObject = [
+                    {
+                        "endPoint": "/v1/health",
+                        "method": "GET",
+                        "headers": [
+                            "first"
+                        ],
+                        requestNodesToMask:["key1","key3"]
+                    }
+                ];
+
+                index.init(stubLogger, maskingObject);
+                stubNext = sandbox.stub();
+                index.requestMiddleware(requestObject, responseObject, stubNext);
+                responseObject.end(expectedResponseBody, "UTF-8");
+            });
+
+
+            it("Should mask all the body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Start handling request %s:%s", requestObject.method, requestObject.originalUrl),
+                    {headers: JSON.stringify({"first": "v***e", "second": "value"})},
+                    {body: JSON.stringify({"key1": "v***e","key2":"value","key3":"v***e"})}).calledOnce.should.equal(true);
+            });
+            it("Should mask response body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Finish handle %s:%s request", requestObject.method, requestObject.originalUrl),
+                    util.format("statusCode: %s", responseObject.statusCode),
+                    util.format("headers: %j", {"first": "v***e", "second": "value"}),
+                    util.format("responseBody: %s", JSON.stringify({
+                        "firstKey": "f********e",
+                        "secondKey": "s*********e"
+                    }))).calledOnce.should.equal(true);
+            });
+
+            it("Should call next", function () {
+                stubNext.withArgs().calledOnce.should.equal(true);
+            })
+
+        });
+
+        describe("When call it with object to be mask with specific response node to mask", function () {
+            var sandbox;
+            var requestObject;
+            var responseObject;
+            var expectedResponseBody;
+            var stubLogger;
+            var stubNext;
+            var maskingObject;
+
+            before(function () {
+                sandbox = sinon.sandbox.create();
+                stubLogger = {info: sandbox.stub()};
+
+                requestObject = {
+                    method: "GET",
+                    originalUrl: "/v1/health",
+                    headers: {"first": "value", "second": "value"},
+                    body: {"key1": "value","key2":"value","key3":"value"}
+                };
+
+                responseObject = {
+                    statusCode: 200,
+                    end: sandbox.stub()
+                };
+
+                expectedResponseBody = JSON.stringify({
+                    "firstKey": "firstValue",
+                    "secondKey": "secondValue"
+                });
+
+                maskingObject = [
+                    {
+                        "endPoint": "/v1/health",
+                        "method": "GET",
+                        "headers": [
+                            "first"
+                        ],
+                        responseNodesToMask:["firstKey"]
+                    }
+                ];
+
+                index.init(stubLogger, maskingObject);
+                stubNext = sandbox.stub();
+                index.requestMiddleware(requestObject, responseObject, stubNext);
+                responseObject.end(expectedResponseBody, "UTF-8");
+            });
+
+
+            it("Should mask all the body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Start handling request %s:%s", requestObject.method, requestObject.originalUrl),
+                    {headers: JSON.stringify({"first": "v***e", "second": "value"})},
+                    {body: JSON.stringify({"key1": "v***e","key2":"v***e","key3":"v***e"})}).calledOnce.should.equal(true);
+            });
+            it("Should mask response body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Finish handle %s:%s request", requestObject.method, requestObject.originalUrl),
+                    util.format("statusCode: %s", responseObject.statusCode),
+                    util.format("headers: %j", {"first": "v***e", "second": "value"}),
+                    util.format("responseBody: %s", JSON.stringify({
+                        "firstKey": "f********e",
+                        "secondKey": "secondValue"
+                    }))).calledOnce.should.equal(true);
+            });
+
+            it("Should call next", function () {
+                stubNext.withArgs().calledOnce.should.equal(true);
+            })
+
+        });
+
+
+        describe("When call it with object to be mask with specific response & request nodes to mask", function () {
+            var sandbox;
+            var requestObject;
+            var responseObject;
+            var expectedResponseBody;
+            var stubLogger;
+            var stubNext;
+            var maskingObject;
+
+            before(function () {
+                sandbox = sinon.sandbox.create();
+                stubLogger = {info: sandbox.stub()};
+
+                requestObject = {
+                    method: "GET",
+                    originalUrl: "/v1/health",
+                    headers: {"first": "value", "second": "value"},
+                    body: {"key1": "value","key2":"value","key3":"value"}
+                };
+
+                responseObject = {
+                    statusCode: 200,
+                    end: sandbox.stub()
+                };
+
+                expectedResponseBody = JSON.stringify({
+                    "firstKey": "firstValue",
+                    "secondKey": "secondValue"
+                });
+
+                maskingObject = [
+                    {
+                        "endPoint": "/v1/health",
+                        "method": "GET",
+                        "headers": [
+                            "first"
+                        ],
+                        responseNodesToMask:["firstKey"],
+                        requestNodesToMask:["key1"]
+                    }
+                ];
+
+                index.init(stubLogger, maskingObject);
+                stubNext = sandbox.stub();
+                index.requestMiddleware(requestObject, responseObject, stubNext);
+                responseObject.end(expectedResponseBody, "UTF-8");
+            });
+
+
+            it("Should mask all the body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Start handling request %s:%s", requestObject.method, requestObject.originalUrl),
+                    {headers: JSON.stringify({"first": "v***e", "second": "value"})},
+                    {body: JSON.stringify({"key1": "v***e","key2":"value","key3":"value"})}).calledOnce.should.equal(true);
+            });
+            it("Should mask response body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Finish handle %s:%s request", requestObject.method, requestObject.originalUrl),
+                    util.format("statusCode: %s", responseObject.statusCode),
+                    util.format("headers: %j", {"first": "v***e", "second": "value"}),
+                    util.format("responseBody: %s", JSON.stringify({
+                        "firstKey": "f********e",
+                        "secondKey": "secondValue"
+                    }))).calledOnce.should.equal(true);
+            });
+
+            it("Should call next", function () {
+                stubNext.withArgs().calledOnce.should.equal(true);
+            })
+
+        });
+
+
+        describe("When call it with object to be mask without requestBody", function () {
+            var sandbox;
+            var requestObject;
+            var responseObject;
+            var expectedResponseBody;
+            var stubLogger;
+            var stubNext;
+            var maskingObject;
+
+            before(function () {
+                sandbox = sinon.sandbox.create();
+                stubLogger = {info: sandbox.stub()};
+
+                requestObject = {
+                    method: "GET",
+                    originalUrl: "/v1/health",
+                    headers: {"first": "value", "second": "value"}
+                };
+
+                responseObject = {
+                    statusCode: 200,
+                    end: sandbox.stub()
+                };
+
+                expectedResponseBody = JSON.stringify({
+                    "firstKey": "firstValue",
+                    "secondKey": "secondValue"
+                });
+
+                maskingObject = [
+                    {
+                        "endPoint": "/v1/health",
+                        "method": "GET",
+                        "headers": [
+                            "first"
+                        ],
+                        responseNodesToMask:["firstKey"],
+                        requestNodesToMask:["key1"]
+                    }
+                ];
+
+                index.init(stubLogger, maskingObject);
+                stubNext = sandbox.stub();
+                index.requestMiddleware(requestObject, responseObject, stubNext);
+                responseObject.end(expectedResponseBody, "UTF-8");
+            });
+
+
+            it("Should mask all the body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Start handling request %s:%s", requestObject.method, requestObject.originalUrl),
+                    {headers: JSON.stringify({"first": "v***e", "second": "value"})},
+                    {body: undefined}).calledOnce.should.equal(true);
+            });
+            it("Should mask response body and relevant headers", function () {
+                stubLogger.info.withArgs(util.format("Finish handle %s:%s request", requestObject.method, requestObject.originalUrl),
+                    util.format("statusCode: %s", responseObject.statusCode),
+                    util.format("headers: %j", {"first": "v***e", "second": "value"}),
+                    util.format("responseBody: %s", JSON.stringify({
+                        "firstKey": "f********e",
+                        "secondKey": "secondValue"
+                    }))).calledOnce.should.equal(true);
+            });
+
+            it("Should call next", function () {
+                stubNext.withArgs().calledOnce.should.equal(true);
+            })
+
+        });
+
         describe("When call it with object to be mask , but call it with different api", function () {
             var sandbox;
             var requestObject;
@@ -206,7 +485,7 @@ describe("index spec", function () {
             it("Should call next", function () {
                 stubNext.withArgs().calledOnce.should.equal(true);
             })
-        })
+        });
 
         describe("When call it with object to be mask , but call it with different method", function () {
             var sandbox;

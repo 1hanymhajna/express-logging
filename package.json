@@ -1,6 +1,6 @@
 {
   "name": "dynamic-express-logging",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "express logging for incoming request and response",
   "main": "index.js",
   "scripts": {

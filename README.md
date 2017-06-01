@@ -7,9 +7,11 @@
 ## Features
 * Logging every incoming request
 * Logging every response
-* Option to mask all request/response body
-* Option to mask specific headers
-* You can use any logger you want
+* Option to mask all request/response body ( default masking all the request and response)
+* Option to mask specific request nodes (optional)
+* Option to mask specific response nodes (optional)
+* Option to mask specific headers (required)
+* You can use any logger you want ( required)
 
 `Please notice, in case that you want to mask a header from all your request, you have to add object in the JSON for every endpoint`
 
@@ -34,7 +36,7 @@ app.use(dynamicExpressLogging.requestMiddleware);
   }
 ]
 ```
-#### JSON EXAMPLE
+#### JSON EXAMPLE 1
 ```json
 [
   {
@@ -47,6 +49,48 @@ app.use(dynamicExpressLogging.requestMiddleware);
 ]
 ```
 
+#### JSON EXAMPLE 2
+```json
+[
+  {
+    "endPoint": "/v1/health",
+    "method": "GET",
+    "headers":[
+      "user-agent"
+    ],
+    requestNodesToMask :["keyname1","keyname2]
+  }
+]
+```
+
+#### JSON EXAMPLE 3
+```json
+[
+  {
+    "endPoint": "/v1/health",
+    "method": "GET",
+    "headers":[
+      "user-agent"
+    ],
+    responseNodesToMask :["keyname1","keyname2]
+  }
+]
+```
+
+#### JSON EXAMPLE 4
+```json
+[
+  {
+    "endPoint": "/v1/health",
+    "method": "GET",
+    "headers":[
+      "user-agent"
+    ],
+    requestNodesToMask :["keyname1","keyname2],
+    responseNodesToMask :["keyname1","keyname2]
+  }
+]
+```
 
 ### Full example:
 ```node
